@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🎲 Dice Roller</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>🎲 Dice Roller</h1>
+
+    <div class="controls">
+      <label for="diceCount">Number of dice</label>
+      <input type="number" id="diceCount" value="1" min="1" max="20" />
+
+      <label for="diceType">Dice type</label>
+      <select id="diceType">
+        <option value="4">d4</option>
+        <option value="6" selected>d6</option>
+        <option value="8">d8</option>
+        <option value="10">d10</option>
+        <option value="12">d12</option>
+        <option value="20">d20</option>
+        <option value="100">d100</option>
+      </select>
+
+      <button id="rollBtn">Roll!</button>
+    </div>
+
+    <div class="results" id="results" aria-live="polite">
+      <p class="placeholder">Hit Roll to get started.</p>
+    </div>
+
+    <div class="history-section">
+      <h2>Roll History</h2>
+      <ul id="history"></ul>
+      <button id="clearBtn" class="secondary">Clear History</button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

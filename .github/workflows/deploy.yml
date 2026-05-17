@@ -1,9 +1,15 @@
 name: Deploy to GitHub Pages
 
+# ⚠️  IMPORTANT — GitHub Pages Settings:
+# Before this workflow can deploy, you must enable GitHub Actions as the
+# Pages source in your repo:
+#   Settings → Pages → Source → GitHub Actions
+# Without that toggle, the deploy-pages action will fail with a 404.
+
 on:
   push:
-    branches:
-      - main
+    branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -12,7 +18,7 @@ permissions:
 
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   deploy:
@@ -20,12 +26,14 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup Pages
-        uses: actions/configure-pages@v4
+        uses: actions/configure-pages@v5
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
@@ -35,3 +43,20 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+  smoke-test:
+    name: Smoke test — verify live URL returns 200
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check live page returns HTTP 200
+        run: |
+          URL="https://yuanfengli168.github.io/dice-roller/"
+          echo "Testing $URL"
+          STATUS=$(curl -o /dev/null -sw "%{http_code}" --retry 5 --retry-delay 10 --retry-all-errors "$URL")
+          echo "HTTP status: $STATUS"
+          if [ "$STATUS" != "200" ]; then
+            echo "❌ Smoke test FAILED — expected 200, got $STATUS"
+            exit 1
+          fi
+          echo "✅ Smoke test passed — page is live and serving correctly"
